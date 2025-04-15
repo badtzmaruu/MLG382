@@ -13,6 +13,7 @@ with open('scaler.pkl', 'rb') as f:
 DL_model = load_model('deep_learning_model.h5')
 
 app = Dash(__name__)
+server = app.server
 
 # Sample input layout
 app = Dash(__name__)

@@ -1,3 +1,6 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 import pickle
 import numpy as np
 import pandas as pd
@@ -128,8 +131,12 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
          num_features = ['Age', 'StudyTimeWeekly', 'Absences', 'GPA']
          input_df[num_features] = scaler.transform(input_df[num_features])
          
+         print("Loading model...")
          DL_model = get_model()
+         print("Model loaded!")
+
          dl_prediction = DL_model.predict(input_df)
+         print("Prediction done")
 
          if len(dl_prediction.shape) == 2 and dl_prediction.shape[1] > 1:
              class_prediction = np.argmax(dl_prediction)

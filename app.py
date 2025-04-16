@@ -4,13 +4,18 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import load_model
 from dash import Dash, html, dcc, Input, Output
+from functools import lru_cache
+
+@lru_cache(maxsize=1)
+def get_model():
+    return load_model('deep_learning_model.h5')
 
 with open('features.pkl', 'rb') as f:
     features = pickle.load(f)
 
 with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
-DL_model = load_model('deep_learning_model.h5')
+DL_model = get_model()
 
 app = Dash(__name__)
 server = app.server

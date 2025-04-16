@@ -19,29 +19,31 @@ server = app.server
 app.layout = html.Div([
     html.H1("Student Grade Predictor"),
     html.P("Enter values below to predict the grade class"),
-    dcc.Input(id='age', type='number', placeholder='Age'),
+    dcc.Input(id='age', type='number', placeholder='Age', value=18),
     dcc.Dropdown(
             id='gender', 
             options=[{'label': 'Male', 'value': 0}, {'label': 'Female', 'value': 1}],
-            placeholder="Select Gender"
-                ),
-    dcc.Input(id='study_time', type='number', placeholder='Study Time Weekly'),
-    dcc.Input(id='absences', type='number', placeholder='Absences'),
-    dcc.Input(id='gpa', type='number', placeholder='GPA'),
+            placeholder="Select Gender", value=0),
+    dcc.Input(id='study_time', type='number', placeholder='Study Time Weekly', value=15),
+    dcc.Input(id='absences', type='number', placeholder='Absences', value=5),
+    dcc.Input(id='gpa', type='number', placeholder='GPA', value=2),
     dcc.Dropdown(
         id='ethnicity',
         options=[{'label': f'Ethnicity_{i}', 'value': i} for i in range(4)],
-        placeholder="Select Ethnicity"
+        placeholder="Select Ethnicity",
+        value=0
     ),
     dcc.Dropdown(
         id='parental_education',
         options=[{'label': f'Parental Education {i}', 'value': i} for i in range(5)],
-        placeholder="Select Parental Education"
+        placeholder="Select Parental Education",
+        value=0
     ),
     dcc.Dropdown(
         id='parental_support',
         options=[{'label': f'Parental Support {i}', 'value': i} for i in range(5)],
-        placeholder="Select Parental Support"
+        placeholder="Select Parental Support",
+        value=0
     ),
     dcc.Checklist(
         id='sports',

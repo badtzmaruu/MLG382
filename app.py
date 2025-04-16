@@ -8,6 +8,7 @@ from functools import lru_cache
 
 @lru_cache(maxsize=1)
 def get_model():
+    print("Loading deep learning model...")
     return load_model('deep_learning_model.h5')
 
 with open('features.pkl', 'rb') as f:
@@ -15,7 +16,7 @@ with open('features.pkl', 'rb') as f:
 
 with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
-DL_model = get_model()
+
 
 app = Dash(__name__)
 server = app.server
@@ -127,6 +128,7 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
          num_features = ['Age', 'StudyTimeWeekly', 'Absences', 'GPA']
          input_df[num_features] = scaler.transform(input_df[num_features])
          
+         DL_model = get_model()
          dl_prediction = DL_model.predict(input_df)
 
          if len(dl_prediction.shape) == 2 and dl_prediction.shape[1] > 1:

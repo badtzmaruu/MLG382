@@ -1,6 +1,7 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+import xgboost as xgb
 import pickle
 import numpy as np
 import pandas as pd
@@ -10,9 +11,9 @@ from dash import Dash, html, dcc, Input, Output
 from functools import lru_cache
 
 @lru_cache(maxsize=1)
-def get_model():
+def get_DLmodel():
     print("Loading deep learning model...")
-    return load_model('deep_learning_model.h5')
+    return load_model(r'artifacts\deep_learning_model.h5')
 
 with open('features.pkl', 'rb') as f:
     features = pickle.load(f)
@@ -20,6 +21,14 @@ with open('features.pkl', 'rb') as f:
 with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
+with open(r'artifacts\randomforest_model.pkl', 'rb') as f:
+    randomforest_model = pickle.load(f)
+
+with open(r'artifacts\regression_model.pkl', 'rb') as f:
+    regression_model = pickle.load(f)
+
+with open(r'artifacts\xgboost_model.pkl', 'rb') as f:
+    xgboost_model = pickle.load(f)
 
 app = Dash(__name__)
 server = app.server
@@ -100,13 +109,13 @@ app.layout = html.Div([
      Input('sports', 'value'),
      Input('music', 'value'),
      Input('volunteering', 'value'),
-     Input('gpa', 'value'),
+     #Input('gpa', 'value'),
      Input('ethnicity', 'value'),
      Input('parental_education', 'value'),
      Input('parental_support', 'value')]
 )
-def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurricular, sports, music, volunteering, gpa, ethnicity, parental_education, parental_support):
-    if n_clicks > 0 and None not in (age, gender, study_time, absences, gpa, ethnicity, parental_education, parental_support):
+def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurricular, sports, music, volunteering, ethnicity, parental_education, parental_support):
+    if n_clicks > 0 and None not in (age, gender, study_time, absences, ethnicity, parental_education, parental_support):
          input_data = {
             'Age': [age],
             'Gender': [gender],
@@ -119,8 +128,8 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
             'Extracurricular': [1 if extracurricular and 1 in extracurricular else 0],
             'Sports': [1 if sports and  1 in sports else 0],
             'Music': [1 if music and 1 in music else 0],
-            'Volunteering': [1 if volunteering and 1 in volunteering else 0],
-            'GPA': [gpa],
+            'Volunteering': [1 if volunteering and 1 in volunteering else 0]
+            #'GPA': [gpa],
         }
          
          input_df = pd.DataFrame(input_data)
@@ -128,14 +137,19 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
 
          input_df = input_df[features]
          
-         num_features = ['Age', 'StudyTimeWeekly', 'Absences', 'GPA']
+         num_features = ['Age', 'StudyTimeWeekly', 'Absences']
          input_df[num_features] = scaler.transform(input_df[num_features])
          
+    
+         #Deep learning
          print("Loading model...")
-         DL_model = get_model()
+         DL_model = get_DLmodel()
          print("Model loaded!")
 
          dl_prediction = DL_model.predict(input_df)
+         rf_prediction = randomforest_model.predict(input_df)
+         logreg_prediction = regression_model.predict(input_df)
+         xgboost_prediction = xgboost_model.predict(input_df)
          print("Prediction done")
 
          if len(dl_prediction.shape) == 2 and dl_prediction.shape[1] > 1:
@@ -146,8 +160,10 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
              probability = float(dl_prediction[0][0]) if class_prediction == 1 else 1 - float(dl_prediction[0][0])
 
          probability_percent = probability * 100
+         
+        
 
-         return f"Deep Learning Prediction: {class_prediction} Probability: {probability_percent}%"
+         return f"Deep Learning Prediction: {class_prediction} Probability: {probability_percent}% Random Forest Prediction: {rf_prediction[0]} Logistic Regression Prediction: {logreg_prediction[0]} XGboost Prediction: {xgboost_prediction}"
     return "Please fill in all fields."
         
 if __name__ == "__main__":

@@ -47,19 +47,36 @@ app.layout = html.Div([
     dcc.Input(id='gpa', type='number', placeholder='GPA', value=2),
     dcc.Dropdown(
         id='ethnicity',
-        options=[{'label': f'Ethnicity_{i}', 'value': i} for i in range(4)],
+        options=[
+            {'label': 'Caucasian', 'value': 0},
+            {'label': 'African American', 'value': 1},
+            {'label': 'Asian', 'value': 2},
+            {'label': 'Other', 'value': 3},
+        ],
         placeholder="Select Ethnicity",
         value=0
     ),
     dcc.Dropdown(
         id='parental_education',
-        options=[{'label': f'Parental Education {i}', 'value': i} for i in range(5)],
+        options=[
+            {'label': 'None', 'value': 0},
+            {'label': 'High School', 'value': 1},
+            {'label': 'Some College', 'value': 2},
+            {'label': 'Bachelors', 'value': 3},
+            {'label': 'Higher Study', 'value': 4}
+        ],
         placeholder="Select Parental Education",
         value=0
     ),
     dcc.Dropdown(
         id='parental_support',
-        options=[{'label': f'Parental Support {i}', 'value': i} for i in range(5)],
+        options=[
+            {'label': 'None', 'value': 0},
+            {'label': 'Low', 'value': 1},
+            {'label': 'Moderate', 'value': 2},
+            {'label': 'High', 'value': 3},
+            {'label': 'Very High', 'value': 4}
+        ],
         placeholder="Select Parental Support",
         value=0
     ),

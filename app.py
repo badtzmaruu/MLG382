@@ -16,7 +16,6 @@ app = Dash(__name__)
 server = app.server
 
 # Sample input layout
-app = Dash(__name__)
 app.layout = html.Div([
     html.H1("Student Grade Predictor"),
     html.P("Enter values below to predict the grade class"),

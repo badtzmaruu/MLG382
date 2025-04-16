@@ -13,7 +13,7 @@ from functools import lru_cache
 @lru_cache(maxsize=1)
 def get_DLmodel():
     print("Loading deep learning model...")
-    return load_model(r'artifacts\deep_learning_model.h5')
+    return load_model(r'artifacts/deep_learning_model.h5')
 
 with open('features.pkl', 'rb') as f:
     features = pickle.load(f)
@@ -21,13 +21,13 @@ with open('features.pkl', 'rb') as f:
 with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
-with open(r'artifacts\randomforest_model.pkl', 'rb') as f:
+with open(r'artifacts/randomforest_model.pkl', 'rb') as f:
     randomforest_model = pickle.load(f)
 
-with open(r'artifacts\regression_model.pkl', 'rb') as f:
+with open(r'artifacts/regression_model.pkl', 'rb') as f:
     regression_model = pickle.load(f)
 
-with open(r'artifacts\xgboost_model.pkl', 'rb') as f:
+with open(r'artifacts/xgboost_model.pkl', 'rb') as f:
     xgboost_model = pickle.load(f)
 
 app = Dash(__name__)
@@ -163,7 +163,13 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
          
         
 
-         return f"Deep Learning Prediction: {class_prediction} Probability: {probability_percent}% Random Forest Prediction: {rf_prediction[0]} Logistic Regression Prediction: {logreg_prediction[0]} XGboost Prediction: {xgboost_prediction}"
+         return html.Div([
+            html.P(f"Deep Learning Prediction: {class_prediction} (Confidence: {probability_percent:.2f}%)"),
+            html.P(f"Random Forest Prediction: {rf_prediction[0]}"),
+            html.P(f"Logistic Regression Prediction: {logreg_prediction[0]}"),
+            html.P(f"XGBoost Prediction: {xgboost_prediction[0]}")
+])
+
     return "Please fill in all fields."
         
 if __name__ == "__main__":

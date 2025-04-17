@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import load_model
 from dash import Dash, html, dcc, Input, Output
 from functools import lru_cache
+import dash_bootstrap_components as dbc
 
 @lru_cache(maxsize=1)
 def get_DLmodel():
@@ -30,89 +31,116 @@ with open(r'artifacts/regression_model.pkl', 'rb') as f:
 with open(r'artifacts/xgboost_model.pkl', 'rb') as f:
     xgboost_model = pickle.load(f)
 
-app = Dash(__name__)
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 # Sample input layout
-app.layout = html.Div([
-    html.H1("Student Grade Predictor"),
-    html.P("Enter values below to predict the grade class"),
-    dcc.Input(id='age', type='number', placeholder='Age', value=18),
-    dcc.Dropdown(
-            id='gender', 
-            options=[{'label': 'Male', 'value': 0}, {'label': 'Female', 'value': 1}],
-            placeholder="Select Gender", value=0),
-    dcc.Input(id='study_time', type='number', placeholder='Study Time Weekly', value=15),
-    dcc.Input(id='absences', type='number', placeholder='Absences', value=5),
-    dcc.Input(id='gpa', type='number', placeholder='GPA', value=2),
-    dcc.Dropdown(
-        id='ethnicity',
-        options=[
-            {'label': 'Caucasian', 'value': 0},
-            {'label': 'African American', 'value': 1},
-            {'label': 'Asian', 'value': 2},
-            {'label': 'Other', 'value': 3},
-        ],
-        placeholder="Select Ethnicity",
-        value=0
-    ),
-    dcc.Dropdown(
-        id='parental_education',
-        options=[
-            {'label': 'None', 'value': 0},
-            {'label': 'High School', 'value': 1},
-            {'label': 'Some College', 'value': 2},
-            {'label': 'Bachelors', 'value': 3},
-            {'label': 'Higher Study', 'value': 4}
-        ],
-        placeholder="Select Parental Education",
-        value=0
-    ),
-    dcc.Dropdown(
-        id='parental_support',
-        options=[
-            {'label': 'None', 'value': 0},
-            {'label': 'Low', 'value': 1},
-            {'label': 'Moderate', 'value': 2},
-            {'label': 'High', 'value': 3},
-            {'label': 'Very High', 'value': 4}
-        ],
-        placeholder="Select Parental Support",
-        value=0
-    ),
-    dcc.Checklist(
-        id='sports',
-        options=[{'label': 'Sports', 'value': 1}],
-        value=[],
-        labelStyle={'display': 'inline-block'}
-    ),
-    dcc.Checklist(
-        id='music',
-        options=[{'label': 'Music', 'value': 1}],
-        value=[],
-        labelStyle={'display': 'inline-block'}
-    ),
-     dcc.Checklist(
-        id='tutoring',
-        options=[{'label': 'Tutoring', 'value': 1}],
-        value=[],
-        labelStyle={'display': 'inline-block'}
-    ),
-     dcc.Checklist(
-        id='extracurricular',
-        options=[{'label': 'Extracurricular', 'value': 1}],
-        value=[],
-        labelStyle={'display': 'inline-block'}
-    ),
-     dcc.Checklist(
-        id='volunteering',
-        options=[{'label': 'Volunteering', 'value': 1}],
-        value=[],
-        labelStyle={'display': 'inline-block'}
-    ),
-    html.Button("Predict", id='predict_button', n_clicks=0),
-    html.Div(id='prediction-output')
-])
+app.layout = dbc.Container([
+    dbc.Row([
+        dbc.Col(html.H1("Student Grade Predictor", className="text-center mb-4"), width=12)
+    ]),
+    
+    dbc.Row([
+        dbc.Col(
+            dbc.Card([
+                dbc.CardBody([
+
+                    dbc.Label("Age", className="text-center w-100"),
+                    dbc.Input(id='age', type='number', value=18, className="mb-3"),
+
+                    dbc.Label("Gender", className="text-center w-100"),
+                    dcc.Dropdown(
+                        id='gender',
+                        options=[{'label': 'Male', 'value': 0}, {'label': 'Female', 'value': 1}],
+                        value=0,
+                        className="mb-3"
+                    ),
+
+                    dbc.Label("Study Time Weekly", className="text-center w-100"),
+                    dbc.Input(id='study_time', type='number', value=15, className="mb-3"),
+
+                    dbc.Label("Absences", className="text-center w-100"),
+                    dbc.Input(id='absences', type='number', value=5, className="mb-3"),
+
+                    dbc.Label("GPA", className="text-center w-100"),
+                    dbc.Input(id='gpa', type='number', value=2, className="mb-3"),
+
+                    dbc.Label("Ethnicity", className="text-center w-100"),
+                    dcc.Dropdown(
+                        id='ethnicity',
+                        options=[
+                            {'label': 'Caucasian', 'value': 0},
+                            {'label': 'African American', 'value': 1},
+                            {'label': 'Asian', 'value': 2},
+                            {'label': 'Other', 'value': 3},
+                        ],
+                        value=0,
+                        className="mb-3"
+                    ),
+
+                    dbc.Label("Parental Education", className="text-center w-100"),
+                    dcc.Dropdown(
+                        id='parental_education',
+                        options=[
+                            {'label': 'None', 'value': 0},
+                            {'label': 'High School', 'value': 1},
+                            {'label': 'Some College', 'value': 2},
+                            {'label': 'Bachelors', 'value': 3},
+                            {'label': 'Higher Study', 'value': 4}
+                        ],
+                        value=0,
+                        className="mb-3"
+                    ),
+
+                    dbc.Label("Parental Support", className="text-center w-100"),
+                    dcc.Dropdown(
+                        id='parental_support',
+                        options=[
+                            {'label': 'None', 'value': 0},
+                            {'label': 'Low', 'value': 1},
+                            {'label': 'Moderate', 'value': 2},
+                            {'label': 'High', 'value': 3},
+                            {'label': 'Very High', 'value': 4}
+                        ],
+                        value=0,
+                        className="mb-3"
+                    ),
+
+                    html.Div([
+                        dbc.Label("Activities"),
+                        dbc.Checklist(
+                            options=[{'label': 'Tutoring', 'value': 1}],
+                            value=[], id='tutoring', inline=True
+                        ),
+                        dbc.Checklist(
+                            options=[{'label': 'Extracurricular', 'value': 1}],
+                            value=[], id='extracurricular', inline=True
+                        ),
+                        dbc.Checklist(
+                            options=[{'label': 'Sports', 'value': 1}],
+                            value=[], id='sports', inline=True
+                        ),
+                        dbc.Checklist(
+                            options=[{'label': 'Music', 'value': 1}],
+                            value=[], id='music', inline=True
+                        ),
+                        dbc.Checklist(
+                            options=[{'label': 'Volunteering', 'value': 1}],
+                            value=[], id='volunteering', inline=True
+                        ),
+                    ], className="mb-4"),
+
+                    dbc.Button("Predict", id='predict_button', color="primary", className="mb-3 w-100"),
+
+                    html.Div(id='prediction-output', className="mt-3 text-center")
+
+                ])
+            ], className="p-4 shadow-sm border rounded bg-white"),  # Card styling
+            width=4,
+            className="mx-auto"
+        )
+    ])
+], fluid=True)
 
 @app.callback(
     Output('prediction-output', 'children'),
@@ -132,7 +160,7 @@ app.layout = html.Div([
      Input('parental_support', 'value')]
 )
 def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurricular, sports, music, volunteering, ethnicity, parental_education, parental_support):
-    if n_clicks > 0 and None not in (age, gender, study_time, absences, ethnicity, parental_education, parental_support):
+    if (n_clicks or 0) > 0 and None not in (age, gender, study_time, absences, ethnicity, parental_education, parental_support):
          input_data = {
             'Age': [age],
             'Gender': [gender],
@@ -180,12 +208,23 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
          
         
 
-         return html.Div([
-            html.P(f"Deep Learning Prediction: {class_prediction} (Confidence: {probability_percent:.2f}%)"),
-            html.P(f"Random Forest Prediction: {rf_prediction[0]}"),
-            html.P(f"Logistic Regression Prediction: {logreg_prediction[0]}"),
-            html.P(f"XGBoost Prediction: {xgboost_prediction[0]}")
-])
+         return dbc.Card([
+            dbc.CardHeader("Model Predictions", className="bg-success text-white text-center"),
+            dbc.CardBody([
+                dbc.Table([
+                    html.Thead(html.Tr([
+                        html.Th("Model", className="text-center"),
+                        html.Th("Prediction", className="text-center")
+                    ])),
+                html.Tbody([
+                    html.Tr([html.Td("Deep Learning", className="text-center"), html.Td(f"{class_prediction} (Confidence: {probability_percent:.2f}%)", className="text-center")]),
+                    html.Tr([html.Td("Random Forest", className="text-center"), html.Td(f"{rf_prediction[0]}", className="text-center")]),
+                    html.Tr([html.Td("Logistic Regression", className="text-center"), html.Td(f"{logreg_prediction[0]}", className="text-center")]),
+                    html.Tr([html.Td("XGBoost", className="text-center"), html.Td(f"{xgboost_prediction[0]}", className="text-center")])
+                ])
+                ], bordered=True, striped=True, hover=True, responsive=True)
+            ])
+        ], className="mt-4 shadow-sm")
 
     return "Please fill in all fields."
         

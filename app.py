@@ -62,9 +62,6 @@ app.layout = dbc.Container([
                     dbc.Label("Absences", className="text-center w-100"),
                     dbc.Input(id='absences', type='number', value=5, className="mb-3"),
 
-                    dbc.Label("GPA", className="text-center w-100"),
-                    dbc.Input(id='gpa', type='number', value=2, className="mb-3"),
-
                     dbc.Label("Ethnicity", className="text-center w-100"),
                     dcc.Dropdown(
                         id='ethnicity',
@@ -154,7 +151,6 @@ app.layout = dbc.Container([
      Input('sports', 'value'),
      Input('music', 'value'),
      Input('volunteering', 'value'),
-     #Input('gpa', 'value'),
      Input('ethnicity', 'value'),
      Input('parental_education', 'value'),
      Input('parental_support', 'value')]
@@ -174,7 +170,6 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
             'Sports': [1 if sports and  1 in sports else 0],
             'Music': [1 if music and 1 in music else 0],
             'Volunteering': [1 if volunteering and 1 in volunteering else 0]
-            #'GPA': [gpa],
         }
          
          input_df = pd.DataFrame(input_data)
@@ -185,7 +180,14 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
          num_features = ['Age', 'StudyTimeWeekly', 'Absences']
          input_df[num_features] = scaler.transform(input_df[num_features])
          
-    
+         grade_mapping = {
+            0: "A",
+            1: "B",
+            2: "C",
+            3: "D",
+            4: "F"
+         }
+
          #Deep learning
          print("Loading model...")
          DL_model = get_DLmodel()
@@ -217,10 +219,10 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
                         html.Th("Prediction", className="text-center")
                     ])),
                 html.Tbody([
-                    html.Tr([html.Td("Deep Learning", className="text-center"), html.Td(f"{class_prediction} (Confidence: {probability_percent:.2f}%)", className="text-center")]),
-                    html.Tr([html.Td("Random Forest", className="text-center"), html.Td(f"{rf_prediction[0]}", className="text-center")]),
-                    html.Tr([html.Td("Logistic Regression", className="text-center"), html.Td(f"{logreg_prediction[0]}", className="text-center")]),
-                    html.Tr([html.Td("XGBoost", className="text-center"), html.Td(f"{xgboost_prediction[0]}", className="text-center")])
+                    html.Tr([html.Td("Deep Learning", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)} (Confidence: {probability_percent:.2f}%)", className="text-center")]),
+                    html.Tr([html.Td("Random Forest", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)}", className="text-center")]),
+                    html.Tr([html.Td("Logistic Regression", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)}", className="text-center")]),
+                    html.Tr([html.Td("XGBoost", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)}", className="text-center")])
                 ])
                 ], bordered=True, striped=True, hover=True, responsive=True)
             ])

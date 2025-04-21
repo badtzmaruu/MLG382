@@ -11,24 +11,27 @@ from dash import Dash, html, dcc, Input, Output
 from functools import lru_cache
 import dash_bootstrap_components as dbc
 
+#Loading models
 @lru_cache(maxsize=1)
 def get_DLmodel():
     print("Loading deep learning model...")
-    return load_model(r'artifacts/deep_learning_model.h5')
+    return load_model(r'../artifacts/deep_learning_model.h5')
 
-with open('features.pkl', 'rb') as f:
+DL_model = get_DLmodel()
+
+with open(r'../artifacts/features.pkl', 'rb') as f:
     features = pickle.load(f)
 
-with open('scaler.pkl', 'rb') as f:
+with open(r'../artifacts/scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
-with open(r'artifacts/randomforest_model.pkl', 'rb') as f:
+with open(r'../artifacts/randomforest_model.pkl', 'rb') as f:
     randomforest_model = pickle.load(f)
 
-with open(r'artifacts/regression_model.pkl', 'rb') as f:
+with open(r'../artifacts/regression_model.pkl', 'rb') as f:
     regression_model = pickle.load(f)
 
-with open(r'artifacts/xgboost_model.pkl', 'rb') as f:
+with open(r'../artifacts/xgboost_model.pkl', 'rb') as f:
     xgboost_model = pickle.load(f)
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -132,7 +135,7 @@ app.layout = dbc.Container([
                     html.Div(id='prediction-output', className="mt-3 text-center")
 
                 ])
-            ], className="p-4 shadow-sm border rounded bg-white"),  # Card styling
+            ], className="p-4 shadow-sm border rounded bg-white"),  
             width=4,
             className="mx-auto"
         )
@@ -155,6 +158,7 @@ app.layout = dbc.Container([
      Input('parental_education', 'value'),
      Input('parental_support', 'value')]
 )
+
 def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurricular, sports, music, volunteering, ethnicity, parental_education, parental_support):
     if (n_clicks or 0) > 0 and None not in (age, gender, study_time, absences, ethnicity, parental_education, parental_support):
          input_data = {
@@ -177,6 +181,7 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
 
          input_df = input_df[features]
          
+         #Scaling input values
          num_features = ['Age', 'StudyTimeWeekly', 'Absences']
          input_df[num_features] = scaler.transform(input_df[num_features])
          
@@ -187,12 +192,8 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
             3: "D",
             4: "F"
          }
-
-         #Deep learning
-         print("Loading model...")
-         DL_model = get_DLmodel()
-         print("Model loaded!")
-
+         
+         #Predicting with models
          dl_prediction = DL_model.predict(input_df)
          rf_prediction = randomforest_model.predict(input_df)
          logreg_prediction = regression_model.predict(input_df)
@@ -220,9 +221,9 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
                     ])),
                 html.Tbody([
                     html.Tr([html.Td("Deep Learning", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)} (Confidence: {probability_percent:.2f}%)", className="text-center")]),
-                    html.Tr([html.Td("Random Forest", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)}", className="text-center")]),
-                    html.Tr([html.Td("Logistic Regression", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)}", className="text-center")]),
-                    html.Tr([html.Td("XGBoost", className="text-center"), html.Td(f"{grade_mapping.get(class_prediction)}", className="text-center")])
+                    html.Tr([html.Td("Random Forest", className="text-center"), html.Td(f"{grade_mapping.get(int(rf_prediction[0]))}", className="text-center")]),
+                    html.Tr([html.Td("Logistic Regression", className="text-center"), html.Td(f"{grade_mapping.get(int(logreg_prediction[0]))}", className="text-center")]),
+                    html.Tr([html.Td("XGBoost", className="text-center"), html.Td(f"{grade_mapping.get(int(xgboost_prediction[0]))}", className="text-center")])
                 ])
                 ], bordered=True, striped=True, hover=True, responsive=True)
             ])

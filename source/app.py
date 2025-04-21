@@ -12,26 +12,30 @@ from functools import lru_cache
 import dash_bootstrap_components as dbc
 
 #Loading models
+base_dir = os.path.dirname(os.path.abspath(__file__))
+artifacts_dir = os.path.join(base_dir, '..', 'artifacts')
+
 @lru_cache(maxsize=1)
 def get_DLmodel():
     print("Loading deep learning model...")
-    return load_model(r'../artifacts/deep_learning_model.h5')
+    model_path = os.path.join(artifacts_dir, 'deep_learning_model.h5')
+    return load_model(model_path)
 
 DL_model = get_DLmodel()
 
-with open(r'../artifacts/features.pkl', 'rb') as f:
+with open(os.path.join(artifacts_dir, 'features.pkl'), 'rb') as f:
     features = pickle.load(f)
 
-with open(r'../artifacts/scaler.pkl', 'rb') as f:
+with open(os.path.join(artifacts_dir, 'scaler.pkl'), 'rb') as f:
     scaler = pickle.load(f)
 
-with open(r'../artifacts/randomforest_model.pkl', 'rb') as f:
+with open(os.path.join(artifacts_dir, 'randomforest_model.pkl'), 'rb') as f:
     randomforest_model = pickle.load(f)
 
-with open(r'../artifacts/regression_model.pkl', 'rb') as f:
+with open(os.path.join(artifacts_dir, 'regression_model.pkl'), 'rb') as f:
     regression_model = pickle.load(f)
 
-with open(r'../artifacts/xgboost_model.pkl', 'rb') as f:
+with open(os.path.join(artifacts_dir, 'xgboost_model.pkl'), 'rb') as f:
     xgboost_model = pickle.load(f)
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])

@@ -21,22 +21,27 @@ def get_DLmodel():
     model_path = os.path.join(artifacts_dir, 'deep_learning_model.h5')
     return load_model(model_path)
 
-DL_model = get_DLmodel()
+@lru_cache(maxsize=1)
+def get_randomforest_model():
+    with open(os.path.join(artifacts_dir, 'randomforest_model.pkl'), 'rb') as f:
+        return pickle.load(f)
+
+@lru_cache(maxsize=1)
+def get_regression_model():
+    with open(os.path.join(artifacts_dir, 'regression_model.pkl'), 'rb') as f:
+        return pickle.load(f)
+
+@lru_cache(maxsize=1)
+def get_xgboost_model():
+    with open(os.path.join(artifacts_dir, 'xgboost_model.pkl'), 'rb') as f:
+        return pickle.load(f)
+
 
 with open(os.path.join(artifacts_dir, 'features.pkl'), 'rb') as f:
     features = pickle.load(f)
 
 with open(os.path.join(artifacts_dir, 'scaler.pkl'), 'rb') as f:
     scaler = pickle.load(f)
-
-with open(os.path.join(artifacts_dir, 'randomforest_model.pkl'), 'rb') as f:
-    randomforest_model = pickle.load(f)
-
-with open(os.path.join(artifacts_dir, 'regression_model.pkl'), 'rb') as f:
-    regression_model = pickle.load(f)
-
-with open(os.path.join(artifacts_dir, 'xgboost_model.pkl'), 'rb') as f:
-    xgboost_model = pickle.load(f)
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
@@ -198,6 +203,10 @@ def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurr
          }
          
          #Predicting with models
+         DL_model = get_DLmodel()
+         randomforest_model = get_randomforest_model()
+         regression_model = get_regression_model()
+         xgboost_model = get_xgboost_model()
          dl_prediction = DL_model.predict(input_df)
          rf_prediction = randomforest_model.predict(input_df)
          logreg_prediction = regression_model.predict(input_df)

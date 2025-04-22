@@ -170,6 +170,24 @@ app.layout = dbc.Container([
 
 def predict_grade(n_clicks, age, gender,study_time, absences, tutoring,extracurricular, sports, music, volunteering, ethnicity, parental_education, parental_support):
     if (n_clicks or 0) > 0 and None not in (age, gender, study_time, absences, ethnicity, parental_education, parental_support):
+         
+         try:
+            age = int(age)
+            if not (15 <= age <= 20):
+                return dbc.Alert("Age must be between 15 and 20.", color="danger", dismissable=True)
+
+            study_time = float(study_time)
+            if not (0 <= study_time <= 80):
+                return dbc.Alert("Study time must be between 0 and 80 hours/week.", color="danger", dismissable=True)
+
+            absences = int(absences)
+            if absences < 0:
+                return dbc.Alert("Absences cannot be negative.", color="danger", dismissable=True)
+
+         except (ValueError, TypeError):
+            return "Error: Age, study time, and absences must be valid numbers."
+
+
          input_data = {
             'Age': [age],
             'Gender': [gender],
